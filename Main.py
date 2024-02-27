@@ -1,3 +1,4 @@
+import random
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
@@ -32,23 +33,35 @@ class MainWindow(BoxLayout, Screen):
 class ShootoutScreen(BoxLayout, Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.button1 = Button(text="HELLO!")
-        self.button1.bind(on_press=self.handle_button1_clicked)
+
+        for i in range(1,4):
+            self.button = Button(text=str(i))
+            self.button.bind(on_press=self.shoot_out)
+            self.add_widget(self.button)
 
         self.button2 = Button(text="Back")
         self.button2.bind(on_press=self.handle_button2_clicked)
 
-        self.add_widget(self.button1)
+
         self.add_widget(self.button2)
 
-
-
-    def handle_button1_clicked(self, event):
-        print ("Yee HAW")
         
+    def shoot_out(self, button):
+        #Input1
+        buttonId = int(button.text)
+        enemyChoice = random.randint(1,3)
+        print (f"Enemy Chose: {enemyChoice} You Chose: {buttonId}")
+        if (int(buttonId),enemyChoice) in a:
+            print ("Winner!")
+        elif (int(buttonId) == enemyChoice):
+            print ("Quick again!")
+        else:
+            print ("Not today Partner...")
 
     def handle_button2_clicked(self, event):
         sm.current = "main_menu"
+
+    
 
 class WindowManager(ScreenManager):
     pass
@@ -65,15 +78,6 @@ class MyApp(App):
         sm.current = "main_menu"
         return sm  
 
-
-def shoot_out():
-    #Input1
-    #Random Choice 2
-    give_winner()
-
-
-def give_winner(first_selection, second_selection):
-    return (first_selection, second_selection) in a
 
 
 

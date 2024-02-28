@@ -3,6 +3,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.core.window import Window
 
 import sys
@@ -34,16 +35,26 @@ class ShootoutScreen(BoxLayout, Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.orientation='vertical'
+        horizontalBox   = BoxLayout(orientation='horizontal')
+        verticalBox     = BoxLayout(orientation='vertical')
+
         for i in range(1,4):
             self.button = Button(text=str(i))
             self.button.bind(on_press=self.shoot_out)
-            self.add_widget(self.button)
+            horizontalBox.add_widget(self.button)
 
         self.button2 = Button(text="Back")
         self.button2.bind(on_press=self.handle_button2_clicked)
+        horizontalBox.add_widget(self.button2)
 
+        textbox = Label()
+        textbox.text = "hello"
+        verticalBox.add_widget(textbox)
 
-        self.add_widget(self.button2)
+        self.add_widget(verticalBox)
+        self.add_widget(horizontalBox)
+
 
         
     def shoot_out(self, button):
@@ -77,13 +88,6 @@ class MyApp(App):
 
         sm.current = "main_menu"
         return sm  
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":

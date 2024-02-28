@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.properties import StringProperty
 from kivy.core.window import Window
 
 import sys
@@ -36,26 +37,26 @@ class ShootoutScreen(BoxLayout, Screen):
         super().__init__(**kwargs)
 
         self.orientation='vertical'
-        horizontalBox   = BoxLayout(orientation='horizontal')
-        verticalBox     = BoxLayout(orientation='vertical')
+        self.horizontalBox   = BoxLayout(orientation='horizontal')
+        self.verticalBox     = BoxLayout(orientation='vertical')
 
         for i in range(1,4):
             self.button = Button(text=str(i))
             self.button.bind(on_press=self.shoot_out)
-            horizontalBox.add_widget(self.button)
+            self.horizontalBox.add_widget(self.button)
 
         self.button2 = Button(text="Back")
         self.button2.bind(on_press=self.handle_button2_clicked)
-        horizontalBox.add_widget(self.button2)
+        self.horizontalBox.add_widget(self.button2)
 
-        textbox = Label()
-        textbox.text = "hello"
-        verticalBox.add_widget(textbox)
+        self.textbox = Label(text="Prepare to Duel!", markup = True)
+        self.verticalBox.add_widget(self.textbox)
 
-        self.add_widget(verticalBox)
-        self.add_widget(horizontalBox)
+        self.add_widget(self.verticalBox)
+        self.add_widget(self.horizontalBox)
 
-
+    def setText(self, newText):
+        self.textbox.text = newText
         
     def shoot_out(self, button):
         #Input1
@@ -63,11 +64,11 @@ class ShootoutScreen(BoxLayout, Screen):
         enemyChoice = random.randint(1,3)
         print (f"Enemy Chose: {enemyChoice} You Chose: {buttonId}")
         if (int(buttonId),enemyChoice) in a:
-            print ("Winner!")
+            self.setText ("[b][color=#50C878]You Win![/color][/b]")
         elif (int(buttonId) == enemyChoice):
-            print ("Quick again!")
+            self.setText ("Quick again!")
         else:
-            print ("Not today Partner...")
+            self.setText ("[b][color=ff3333]Not Today Partner...[/color][/b]")
 
     def handle_button2_clicked(self, event):
         sm.current = "main_menu"

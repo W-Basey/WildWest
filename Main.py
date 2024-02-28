@@ -26,7 +26,6 @@ class MainWindow(BoxLayout, Screen):
         self.add_widget(self.button2)
 
     def handle_button1_clicked(self, event):
-        print ("Yee HAW")
         sm.current = "shootout_screen"
 
     def handle_button2_clicked(self, event):
@@ -78,6 +77,17 @@ class ShootoutScreen(BoxLayout, Screen):
 class WindowManager(ScreenManager):
     pass
 
+class Player():
+    def __init__(self, ):
+        self.name = ""
+
+        self.statistics = {
+            "Health": 3,
+            "Dexterity": 1,
+            "Ammunition": 5,
+            "Accuracy": 1,
+            "Speed": 1
+        }
 
 
 class MyApp(App):

@@ -40,11 +40,23 @@ class MainWindow(BoxLayout, Screen):
     #Moves current screen to shootout
     def handle_button1_clicked(self, event):
         #Temporary: Reset player and enemy stats for the fight
+        player.statistics = {
+            "max_health": 3,
+            "dexterity": 10,
+            "accuracy": 4,
+            "speed": 6,
+            "damage": 1,
+            "strength": 1
+        }
+
         player.health = player.statistics.get('max_health')
         enemy.health = enemy.statistics.get('max_health')
 
         player.currentDamage = enemy.statistics.get('damage')
         enemy.currentDamage = player.statistics.get('damage')
+
+        player.ammunition = 100
+        enemy.ammunition = 6
 
         sm.current = "shootout_screen"
 
@@ -59,6 +71,8 @@ class ShootoutScreen(BoxLayout, Screen):
 
         #Create the layout for the screen, two smaller boxes placed vertically to each other
         self.orientation='vertical'
+
+        self.toolBar         = BoxLayout(orientation='horizontal')
         self.horizontalBox   = BoxLayout(orientation='horizontal')
         self.verticalBox     = BoxLayout(orientation='vertical')
 
@@ -68,7 +82,7 @@ class ShootoutScreen(BoxLayout, Screen):
             self.button.bind(on_press=self.shoot_out)
             self.horizontalBox.add_widget(self.button)
 
-        #Creat button to return user to main menu
+        #Create button to return user to main menu
         self.button2 = Button(text="Back")
         self.button2.bind(on_press=self.handle_button2_clicked)
         self.horizontalBox.add_widget(self.button2)
@@ -77,7 +91,15 @@ class ShootoutScreen(BoxLayout, Screen):
         self.textbox = Label(text="Prepare to Duel!", markup = True)
         self.verticalBox.add_widget(self.textbox)
 
+        #Create Toolbar for info
+        self.healthBox = Label(text=f"Health: {player.health}", markup = True)
+        self.verticalBox.add_widget(self.healthBox)
+        self.ammoBox = Label(text=f"Ammo: {player.ammunition}", markup = True)
+        self.verticalBox.add_widget(self.ammoBox)
+
+
         #Add the two subboxes to the screen
+        self.add_widget(self.toolBar)
         self.add_widget(self.verticalBox)
         self.add_widget(self.horizontalBox)
 
@@ -90,17 +112,19 @@ class ShootoutScreen(BoxLayout, Screen):
         if (enemy.health<=0):
             sm.current = 'victory_screen'
         else:
-            print (f"Health of the enemy: {enemy.health}\nThe enemy took {player.currentDamage}")
+            print (f"Health of the enemy: {enemy.health}, The enemy took {player.currentDamage}")
             self.setText ("He's hit but not down, go again!")
+            self.ammoBox.text = f"Ammo: {player.ammunition}"
         
     def player_damaged(self):
         player.health-=enemy.currentDamage
         if (player.health<=0):
             sm.current = 'death_screen'
         else:
-            print (f"Health of the player: {player.health}\nThe player took {enemy.currentDamage}")
+            print (f"Health of the player: {player.health}, The player took {enemy.currentDamage}")
             self.setText ("You're hit but it's not over yet!")
-
+            self.ammoBox.text = f"Ammo: {player.ammunition}"
+            self.healthBox.text = f"Health: {player.health}"
 
     def handle_button2_clicked(self, event):
         sm.current = "main_menu"
@@ -128,8 +152,7 @@ class ShootoutScreen(BoxLayout, Screen):
                     entity.currentDamage = 0
                 else:
                     entity.currentDamage = min(max(stat/3,1),entity.ammunition)*entity.currentDamage
-                    entity.ammunition -= min(max(stat/3,1),entity.ammunition)
-
+                    entity.ammunition -= min(max(stat//3,1),entity.ammunition)
             case 'Brawl':
                 stat = entity.statistics.get('strength')
                 entity.currentDamage = stat
@@ -148,7 +171,6 @@ class ShootoutScreen(BoxLayout, Screen):
 
         if (button.text,enemyChoice) in a:
             playerStat+=3
-            self.enemy_damaged()
         elif (button.text == enemyChoice):
             pass
         else:

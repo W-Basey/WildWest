@@ -90,7 +90,7 @@ class ShootoutScreen(BoxLayout, Screen):
         if (enemy.health<=0):
             sm.current = 'victory_screen'
         else:
-            print (f"Health of the enemy: {enemy.health}\nThe enemy took {player.statistics['damage']}")
+            print (f"Health of the enemy: {enemy.health}\nThe enemy took {player.currentDamage}")
             self.setText ("He's hit but not down, go again!")
         
     def player_damaged(self):
@@ -98,7 +98,7 @@ class ShootoutScreen(BoxLayout, Screen):
         if (player.health<=0):
             sm.current = 'death_screen'
         else:
-            print (f"Health of the player: {player.health}")
+            print (f"Health of the player: {player.health}\nThe player took {enemy.currentDamage}")
             self.setText ("You're hit but it's not over yet!")
 
 
@@ -113,13 +113,23 @@ class ShootoutScreen(BoxLayout, Screen):
             case 'Dodge':
                 stat = entity.statistics.get('dexterity')
                 entity.currentDamage = 0
+                print(entity.currentDamage)
             case 'Single-Shot':
                 stat = entity.statistics.get('accuracy')
-                entity.ammunition -=1
+                if entity.ammunition < 1:
+                    print("click.....")
+                    entity.currentDamage = 0
+                else:
+                    entity.ammunition -=1
             case 'Bullet Spray':
                 stat = entity.statistics.get('speed')
-                entity.currentDamage = max(stat/3,1)*entity.currentDamage
-                entity.ammunition -= max(stat/3,1)
+                if entity.ammunition < 1:
+                    print("click.....")
+                    entity.currentDamage = 0
+                else:
+                    entity.currentDamage = min(max(stat/3,1),entity.ammunition)*entity.currentDamage
+                    entity.ammunition -= min(max(stat/3,1),entity.ammunition)
+
             case 'Brawl':
                 stat = entity.statistics.get('strength')
                 entity.currentDamage = stat

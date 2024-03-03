@@ -39,6 +39,13 @@ class MainWindow(BoxLayout, Screen):
 
     #Moves current screen to shootout
     def handle_button1_clicked(self, event):
+        #Temporary: Reset player and enemy stats for the fight
+        player.health = player.statistics.get('max_health')
+        enemy.health = enemy.statistics.get('max_health')
+
+        player.currentDamage = enemy.statistics.get('damage')
+        enemy.currentDamage = player.statistics.get('damage')
+
         sm.current = "shootout_screen"
 
     #Closes the application
@@ -49,13 +56,6 @@ class MainWindow(BoxLayout, Screen):
 class ShootoutScreen(BoxLayout, Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-
-        #Create the enemy for the shootout
-        self.enemy = Enemy()
-        #Temporary: Reset player and enemy stats for the fight
-        player.health = player.statistics.get('max_health')
-        self.enemy.health = self.enemy.statistics.get('max_health')
-
 
         #Create the layout for the screen, two smaller boxes placed vertically to each other
         self.orientation='vertical'
@@ -84,29 +84,23 @@ class ShootoutScreen(BoxLayout, Screen):
     #Setter for main text area
     def setText(self, newText):
         self.textbox.text = newText
-    
-    #Player vs Enemy RPS battle main function, activated by button
-    def shoot_out(self, button):
-
-        enemyChoice = random.choice(self.enemy.attackList)
-        print (f"Enemy Chose: {enemyChoice} You Chose: {button.text}")
-        if (button.text,enemyChoice) in a:
-            self.enemy.health-=player.statistics.get('damage')
-            if (self.enemy.health<=0):
-                sm.current = 'victory_screen'
-            else:
-                print (f"Health of the enemy: {self.enemy.health}\nThe enemy took {player.statistics['damage']}")
-                self.setText ("He's hit but not down, go again!")
-        elif (button.text == enemyChoice):
-            self.setText ("Quick again!")
-        else:
-            player.health-=self.enemy.statistics.get('damage')
-            if (player.health<=0):
-                sm.current = 'death_screen'
-            else:
-                print (f"Health of the player: {player.health}")
-                self.setText ("You're hit but it's not over yet!")
             
+    def enemy_damaged(self):
+        enemy.health-=player.currentDamage
+        if (enemy.health<=0):
+            sm.current = 'victory_screen'
+        else:
+            print (f"Health of the enemy: {enemy.health}\nThe enemy took {player.statistics['damage']}")
+            self.setText ("He's hit but not down, go again!")
+        
+    def player_damaged(self):
+        player.health-=enemy.currentDamage
+        if (player.health<=0):
+            sm.current = 'death_screen'
+        else:
+            print (f"Health of the player: {player.health}")
+            self.setText ("You're hit but it's not over yet!")
+
 
     def handle_button2_clicked(self, event):
         sm.current = "main_menu"
@@ -114,6 +108,49 @@ class ShootoutScreen(BoxLayout, Screen):
     def shoot_out_round():
         pass
 
+    def match_stats(self, input, entity):
+        match input:
+            case 'Dodge':
+                stat = entity.statistics.get('dexterity')
+                entity.currentDamage = 0
+            case 'Single-Shot':
+                stat = entity.statistics.get('accuracy')
+                entity.ammunition -=1
+            case 'Bullet Spray':
+                stat = entity.statistics.get('speed')
+                entity.currentDamage = max(stat/3,1)*entity.currentDamage
+                entity.ammunition -= max(stat/3,1)
+            case 'Brawl':
+                stat = entity.statistics.get('strength')
+                entity.currentDamage = stat
+        return stat
+
+    #Player vs Enemy RPS battle main function, activated by button
+    def shoot_out(self, button):
+
+        player.currentDamage = enemy.statistics.get('damage')
+        enemy.currentDamage = player.statistics.get('damage')
+
+        enemyChoice = random.choice(enemy.attackList)
+
+        playerStat = self.match_stats(button.text, player)
+        enemyStat = self.match_stats(enemyChoice, enemy)
+
+        if (button.text,enemyChoice) in a:
+            playerStat+=3
+            self.enemy_damaged()
+        elif (button.text == enemyChoice):
+            pass
+        else:
+            enemyStat+=3
+
+        if playerStat > enemyStat:
+            self.enemy_damaged()
+        elif playerStat < enemyStat:
+            self.player_damaged()
+        else:
+             self.setText ("Neither party succeeds")
+        
 #Screen the enemy sees upon a game over
 class DeathScreen(BoxLayout, Screen):
     def __init__(self, **kwargs):
@@ -124,15 +161,12 @@ class DeathScreen(BoxLayout, Screen):
         self.textbox = Label(text="[b][color=ff3333]Not Today Partner...[/color][/b]", markup = True)
 
         self.button1 = Button(text="Exit")
-        self.button1.bind(on_press=self.handle_button2_clicked)
+        self.button1.bind(on_press=self.handle_button1_clicked)
 
         self.add_widget(self.textbox)
         self.add_widget(self.button1)
 
     def handle_button1_clicked(self, event):
-        sm.current = 'shootout_screen'
-
-    def handle_button2_clicked(self, event):
         sm.current = "main_menu"
 
 class VictoryScreen(BoxLayout, Screen):
@@ -165,6 +199,7 @@ class Entity():
 
         self.health = 3
         self.ammunition = 5
+        self.currentDamage = 0
 
         self.statistics = {
             "max_health": 3,
@@ -206,4 +241,5 @@ class MyApp(App):
 if __name__ == "__main__":
     app = MyApp()
     player = Player()
+    enemy = Enemy()
     app.run()

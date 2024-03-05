@@ -42,9 +42,9 @@ class MainWindow(BoxLayout, Screen):
         #Temporary: Reset player and enemy stats for the fight
         player.statistics = {
             "max_health": 3,
-            "dexterity": 10,
+            "dexterity": 2,
             "accuracy": 4,
-            "speed": 6,
+            "speed": 3,
             "damage": 1,
             "strength": 1
         }
@@ -52,10 +52,10 @@ class MainWindow(BoxLayout, Screen):
         player.health = player.statistics.get('max_health')
         enemy.health = enemy.statistics.get('max_health')
 
-        player.currentDamage = enemy.statistics.get('damage')
-        enemy.currentDamage = player.statistics.get('damage')
+        player.currentDamage = player.statistics.get('damage')
+        enemy.currentDamage = enemy.statistics.get('damage')
 
-        player.ammunition = 100
+        player.ammunition = 6
         enemy.ammunition = 6
 
         sm.current = "shootout_screen"
@@ -93,9 +93,9 @@ class ShootoutScreen(BoxLayout, Screen):
 
         #Create Toolbar for info
         self.healthBox = Label(text=f"Health: {player.health}", markup = True)
-        self.verticalBox.add_widget(self.healthBox)
+        self.toolBar.add_widget(self.healthBox)
         self.ammoBox = Label(text=f"Ammo: {player.ammunition}", markup = True)
-        self.verticalBox.add_widget(self.ammoBox)
+        self.toolBar.add_widget(self.ammoBox)
 
 
         #Add the two subboxes to the screen
@@ -106,25 +106,28 @@ class ShootoutScreen(BoxLayout, Screen):
     #Setter for main text area
     def setText(self, newText):
         self.textbox.text = newText
+
+    def refreshText(self):
+        self.ammoBox.text = f"Ammo: {player.ammunition}"
+        self.healthBox.text = f"Health: {player.health}"
             
     def enemy_damaged(self):
+        print ("enemy Damaged")
         enemy.health-=player.currentDamage
-        if (enemy.health<=0):
+        if enemy.health<=0:
             sm.current = 'victory_screen'
         else:
             print (f"Health of the enemy: {enemy.health}, The enemy took {player.currentDamage}")
             self.setText ("He's hit but not down, go again!")
-            self.ammoBox.text = f"Ammo: {player.ammunition}"
         
     def player_damaged(self):
+        print ("player damaged")
         player.health-=enemy.currentDamage
-        if (player.health<=0):
+        if player.health<=0:
             sm.current = 'death_screen'
         else:
             print (f"Health of the player: {player.health}, The player took {enemy.currentDamage}")
             self.setText ("You're hit but it's not over yet!")
-            self.ammoBox.text = f"Ammo: {player.ammunition}"
-            self.healthBox.text = f"Health: {player.health}"
 
     def handle_button2_clicked(self, event):
         sm.current = "main_menu"
@@ -133,22 +136,23 @@ class ShootoutScreen(BoxLayout, Screen):
         pass
 
     def match_stats(self, input, entity):
+        print (f"{entity} chose {input}")
+        entity.currentDamage = enemy.statistics.get('damage')
         match input:
             case 'Dodge':
                 stat = entity.statistics.get('dexterity')
                 entity.currentDamage = 0
-                print(entity.currentDamage)
             case 'Single-Shot':
                 stat = entity.statistics.get('accuracy')
                 if entity.ammunition < 1:
-                    print("click.....")
+                    print(f"{entity} click.....")
                     entity.currentDamage = 0
                 else:
                     entity.ammunition -=1
             case 'Bullet Spray':
                 stat = entity.statistics.get('speed')
                 if entity.ammunition < 1:
-                    print("click.....")
+                    print(f"{entity} click.....")
                     entity.currentDamage = 0
                 else:
                     entity.currentDamage = min(max(stat/3,1),entity.ammunition)*entity.currentDamage
@@ -157,6 +161,20 @@ class ShootoutScreen(BoxLayout, Screen):
                 stat = entity.statistics.get('strength')
                 entity.currentDamage = stat
         return stat
+
+    def compare_stats(self, player, enemy):
+        winner = random.randint(1,player+enemy)
+        if winner < player:
+            self.enemy_damaged()
+            print (f"Player Win")
+        elif winner > player:
+            self.player_damaged()
+            print (f"Enemy Win")
+        else:
+            self.setText ("Neither party succeeds")
+            print (f"Draw")
+        print (f"Player: {player} Enemy: {enemy} Rolled: {winner}")
+
 
     #Player vs Enemy RPS battle main function, activated by button
     def shoot_out(self, button):
@@ -175,13 +193,9 @@ class ShootoutScreen(BoxLayout, Screen):
             pass
         else:
             enemyStat+=3
+        self.compare_stats(playerStat, enemyStat)
 
-        if playerStat > enemyStat:
-            self.enemy_damaged()
-        elif playerStat < enemyStat:
-            self.player_damaged()
-        else:
-             self.setText ("Neither party succeeds")
+        self.refreshText()
         
 #Screen the enemy sees upon a game over
 class DeathScreen(BoxLayout, Screen):

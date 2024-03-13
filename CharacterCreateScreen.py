@@ -11,24 +11,24 @@ class CharacterCreateScreen(BoxLayout, Screen):
         super().__init__(**kwargs)
 
         self.statLabels = []
+        self.increaseButtons = []
+        self.decreaseButtons = []
+
+        self.boxlist = []
 
         self.orientation='horizontal'
 
         for x in Global.player.statistics.keys():
-            self.box = BoxLayout(orientation='vertical')
-            self.up = Button(text="Increase")
-            self.up.bind(on_press=lambda *args: self.increaseValue(x))
-            self.box.add_widget(self.up)
-            self.text = Label(text=f"{x} {Global.player.statistics[x]}", markup = True)
-            self.statLabels.append(self.text)
-            self.box.add_widget(self.text)
-            self.down = Button(text="Decrease")
-            self.down.bind(on_press=lambda *args: self.decreaseValue(x))
-
-
-            self.box.add_widget(self.down)
-
-            self.add_widget(self.box)
+            self.boxlist.append(BoxLayout(orientation='vertical'))
+            self.increaseButtons.append(Button(text="Increase"))
+            self.increaseButtons[-1].bind(on_press=lambda *args, cred=x: self.increaseValue(cred))
+            self.boxlist[-1].add_widget(self.increaseButtons[-1])
+            self.statLabels.append(Label(text=f"{x} {Global.player.statistics[x]}", markup = True))
+            self.boxlist[-1].add_widget(self.statLabels[-1])
+            self.decreaseButtons.append(Button(text="Decrease"))
+            self.decreaseButtons[-1].bind(on_press=lambda *args, cred=x: self.decreaseValue(cred))
+            self.boxlist[-1].add_widget(self.decreaseButtons[-1])
+            self.add_widget(self.boxlist[-1])
         
 
         self.exitButton = Button(text="Exit")
@@ -50,11 +50,9 @@ class CharacterCreateScreen(BoxLayout, Screen):
         print (f"Increased {currentkey}")
         Global.player.statistics[currentkey] += 1
         self.refreshLabels()
-        return 1
 
 
     def decreaseValue(self, currentkey):
         print(f"Decreased {currentkey}")
         Global.player.statistics[currentkey] -= 1
         self.refreshLabels()
-        return 1

@@ -82,9 +82,6 @@ class ShootoutScreen(BoxLayout, Screen):
         self.manager.current = "main_menu"
         #self.manager.current = "main_menu"
 
-    def shoot_out_round():
-        pass
-
     def match_stats(self, input, entity):
         print (f"{entity} chose {input}")
         entity.currentDamage = Global.enemy.statistics.get('damage')

@@ -1,10 +1,10 @@
 from kivy.core.window import Window
 
 from Application import Application
-#Define Globals
+
 
 #Define overall app charicteristics
-Window.size = (600, 400)
+Window.size = (1000, 600)
 
 
 if __name__ == "__main__":

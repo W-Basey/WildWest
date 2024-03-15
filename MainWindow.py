@@ -29,26 +29,12 @@ class MainWindow(BoxLayout, Screen):
 
     #Moves current screen to shootout
     def gotoShootOut(self, event):
-        #Temporary: Reset player and enemy stats for the fight
-        Global.player.statistics = {
-            "max_health": 3,
-            "dexterity": 2,
-            "accuracy": 4,
-            "speed": 3,
-            "damage": 1,
-            "strength": 1
-        }
+        Global.player.refresh()
+        Global.enemy.refresh
 
-        Global.player.health = Global.player.statistics.get('max_health')
-        Global.enemy.health = Global.enemy.statistics.get('max_health')
-
-        Global.player.currentDamage = Global.player.statistics.get('damage')
-        Global.enemy.currentDamage = Global.enemy.statistics.get('damage')
-
-        Global.player.ammunition = 6
-        Global.enemy.ammunition = 6
-
-        self.manager.current = "shootout_screen"
+        shootOutscreen = self.manager.get_screen('shootout_screen')
+        shootOutscreen.refreshText()
+        self.manager.current = 'shootout_screen'
 
     #Closes the application
     def exitGame(self, event):

@@ -41,18 +41,15 @@ class CharacterCreateScreen(BoxLayout, Screen):
 
     def refreshLabels(self):
         i = 0
-        print (self.statLabels)
         for x in Global.player.statistics.keys():
             self.statLabels[i].text = f"{x} {Global.player.statistics[x]}"
             i+=1
 
     def increaseValue(self, currentkey):
-        print (f"Increased {currentkey}")
         Global.player.statistics[currentkey] += 1
         self.refreshLabels()
 
 
     def decreaseValue(self, currentkey):
-        print(f"Decreased {currentkey}")
         Global.player.statistics[currentkey] -= 1
         self.refreshLabels()

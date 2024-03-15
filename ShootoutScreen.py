@@ -52,6 +52,11 @@ class ShootoutScreen(BoxLayout, Screen):
         self.add_widget(self.verticalBox)
         self.add_widget(self.horizontalBox)
 
+        self.refreshText()
+
+    def on_enter(self):
+        self.refreshText
+
     #Setter for main text area
     def setText(self, newText):
         self.textbox.text = newText

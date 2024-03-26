@@ -52,6 +52,11 @@ class ShootoutScreen(BoxLayout, Screen):
         self.add_widget(self.verticalBox)
         self.add_widget(self.horizontalBox)
 
+        self.refreshText()
+
+    def on_enter(self):
+        self.refreshText
+
     #Setter for main text area
     def setText(self, newText):
         self.textbox.text = newText
@@ -81,9 +86,6 @@ class ShootoutScreen(BoxLayout, Screen):
     def toMainMenu(self, event):
         self.manager.current = "main_menu"
         #self.manager.current = "main_menu"
-
-    def shoot_out_round():
-        pass
 
     def match_stats(self, input, entity):
         print (f"{entity} chose {input}")

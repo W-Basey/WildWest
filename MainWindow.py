@@ -10,39 +10,32 @@ class MainWindow(BoxLayout, Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self.button1 = Button(text="ShootOut!")
-        self.button1.bind(on_press=self.handle_button1_clicked)
+        self.shootOutButton = Button(text="ShootOut!")
+        self.shootOutButton.bind(on_press=self.gotoShootOut)
 
-        self.button2 = Button(text="Exit")
-        self.button2.bind(on_press=self.handle_button2_clicked)
+        self.exitButton = Button(text="Exit")
+        self.exitButton.bind(on_press=self.exitGame)
+
+        self.characterCreate = Button(text="Create a Character")
+        self.characterCreate.bind(on_press=self.gotoCharacterCreate)
 
         #Add widgets to the screen
-        self.add_widget(self.button1)
-        self.add_widget(self.button2)
+        self.add_widget(self.shootOutButton)
+        self.add_widget(self.characterCreate)
+        self.add_widget(self.exitButton)
+
+    def gotoCharacterCreate(self, event):
+        self.manager.current = 'character_create_screen'
 
     #Moves current screen to shootout
-    def handle_button1_clicked(self, event):
-        #Temporary: Reset player and enemy stats for the fight
-        Global.player.statistics = {
-            "max_health": 3,
-            "dexterity": 2,
-            "accuracy": 4,
-            "speed": 3,
-            "damage": 1,
-            "strength": 1
-        }
+    def gotoShootOut(self, event):
+        Global.player.refresh()
+        Global.enemy.refresh
 
-        Global.player.health = Global.player.statistics.get('max_health')
-        Global.enemy.health = Global.enemy.statistics.get('max_health')
-
-        Global.player.currentDamage = Global.player.statistics.get('damage')
-        Global.enemy.currentDamage = Global.enemy.statistics.get('damage')
-
-        Global.player.ammunition = 6
-        Global.enemy.ammunition = 6
-
-        self.manager.current = "shootout_screen"
+        shootOutscreen = self.manager.get_screen('shootout_screen')
+        shootOutscreen.refreshText()
+        self.manager.current = 'shootout_screen'
 
     #Closes the application
-    def handle_button2_clicked(self, event):
+    def exitGame(self, event):
         sys.exit()
